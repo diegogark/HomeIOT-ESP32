@@ -24,7 +24,7 @@
 
 // Definições
 #define FIREBASE_HOST "https://homeiot-87150.firebaseio.com/"
-#define FIREBASE_AUTH "YW4687kDaAksdVUAGjNQoZpbhXjlMQjAlfpKzXYe"
+#define FIREBASE_AUTH ""
 #define WIFI_SSID "Home"
 #define WIFI_PASSWORD "asdfghjkl"
 #define DHTPIN 23     // pino de dados do DHT11
