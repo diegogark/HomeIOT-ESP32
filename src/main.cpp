@@ -23,10 +23,10 @@
 #include <Adafruit_BMP085.h>
 
 // Definições
-#define FIREBASE_HOST "https://homeiot-87150.firebaseio.com/"
-#define FIREBASE_AUTH ""
-#define WIFI_SSID "Home"
-#define WIFI_PASSWORD "asdfghjkl"
+#define FIREBASE_HOST "https://homeiot-87150.firebaseio.com/" // caminho do firebase
+#define FIREBASE_AUTH "ChaveSecretaFirebase"
+#define WIFI_SSID "NomeDaWIFI"
+#define WIFI_PASSWORD "SenhaWIFI"
 #define DHTPIN 23     // pino de dados do DHT11
 #define DHTTYPE DHT11 // define o tipo de sensor, no caso DHT11
 #define EXECUTADO 0   // sem comando ou comando executado
