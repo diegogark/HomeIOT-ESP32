@@ -6,3 +6,9 @@ O código utiliza o Firebase para armazenamento de informações e recepção de
 
 Uma versão do aplicativo para monitoramento e controle via celular pode ser encontrada no link abaixo (apenas android).
 * [APP de monitoramento para android]( https://github.com/diegogark/HomeIOT-APP)
+
+## Dispositivos Testados
+
+* ESP32 DEVKIT V1
+
+## Funcionamento do código
