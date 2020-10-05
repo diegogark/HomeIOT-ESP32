@@ -22,7 +22,7 @@ Uma versão do aplicativo para monitoramento e controle via celular pode ser enc
  
  A separação das atividades em tarefas permite trabalhar em uma atividade específica do programa facilitando a manutenção e aprimoramentos. A criação de uma tarefa no FreeRTOs pode ser observada abaixo. Ela se comporta de uma forma parecida com o conjunto "Setup" e "Loop" que usamos na IDE do arduino. Caso tenha curiosidade em entender como funciona uma task, tem esse excelente tutorial em portugues do Felipe Neves disponivel no site [Embarcados](https://www.embarcados.com.br/esp32-lidando-com-multiprocessamento-parte-ii/) ou o manual do FreeRTOS disponivel [aqui](https://www.freertos.org/Documentation/RTOS_book.html).
 
- A comunicação entre as tarefas é realizada através de um buffer chamado que Queue (fila). As Queues possuem algumas funções que vão além do simples armazenamento de dados. Para saber mais sobre as Queues, tem esse (tutorial em português)[https://www.embarcados.com.br/rtos-queue-sincronizacao-e-comunicacao/] ou o (manual do FreeRTOS)[https://www.freertos.org/wp-content/uploads/2018/07/FreeRTOS_Reference_Manual_V10.0.0.pdf].
+ A comunicação entre as tarefas é realizada através de um buffer chamado que Queue (fila). As Queues possuem algumas funções que vão além do simples armazenamento de dados. Para saber mais sobre as Queues, tem esse [tutorial em português](https://www.embarcados.com.br/rtos-queue-sincronizacao-e-comunicacao/) ou o [manual do FreeRTOS](https://www.freertos.org/wp-content/uploads/2018/07/FreeRTOS_Reference_Manual_V10.0.0.pdf).
 
 
 
