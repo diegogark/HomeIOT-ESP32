@@ -43,9 +43,9 @@ xTaskCreatePinnedToCore(taskSensorBMP180, "BMP180", 2048, NULL, 3, NULL, PRO_CPU
 
 ## Adicionando Comandos
 
- -[ ] opção 1
- -[ ] dois
- -[x] treis
+ -[ ] opção 1/
+ -[ ] dois/
+ -[x] treis/
 
 
 
