@@ -36,10 +36,20 @@ xTaskCreatePinnedToCore(taskSensorBMP180, "BMP180", 2048, NULL, 3, NULL, PRO_CPU
 ```
 * ```taskSensorBMP180``` - Nome da tarefa que será chamada após sua criação.
 * ```"BMP180"``` - Não tem relevancia no programa. serve apenas para identificação da tarefa durante o debugg.
-* ```2048``` - quantidade de memória resevada para execução da tarefa. Se em algum momento a rotina ultrapassar o limite estipulado, causará um erro.
+* ```2048``` - quantidade de memória resevada para execução da tarefa.
 * ```NULL``` - Não é necessário alterar.
 * ```3``` - prioridade da tarefa. quanto mais alto o numero, maior sua prioridade.
-* ```PRO_CPU_NUM``` - nucleo onde será executado a tarefa. Recomendo utilizar esse nucleo para que o outro ```APP_CPU_NUM``` fique dedicado ao firebase.
+* ```PRO_CPU_NUM``` - nucleo onde será executado a tarefa.
+
+A quantidade de memoria utilizada pela tarefa pode ser acompanhada através dos comandos do quadro abaixo. Esses comandos exibe na serial a quantidade de memoria livre na tarefa (task).
+```C++
+      uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
+      Serial.print("Memoria DHT11: ");
+      Serial.println(uxHighWaterMark); // quantidade de memoria sobrando para a tarefa
+```
+
+ Se em algum momento a rotina ultrapassar o limite estipulado, causará um erro.
+  Recomendo utilizar esse nucleo para que o outro ```APP_CPU_NUM``` fique dedicado ao firebase.
 
 ## Adicionando Comandos
 
