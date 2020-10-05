@@ -26,7 +26,7 @@ Uma versão do aplicativo para monitoramento e controle via celular pode ser enc
  
  Este projeto utiliza 2 semáforos, um para acesso ao firebase e outro para acesso a variavel de tempo. Caso tenha interesse em aprender como funciona o semáforo no FreeRTOS, tem esse [tutorial em portugues sobre semáforos](https://www.embarcados.com.br/rtos-semaforos-sincronizacao-de-tarefas/) ou o [manual do FreeRTOS](https://www.freertos.org/wp-content/uploads/2018/07/FreeRTOS_Reference_Manual_V10.0.0.pdf). Por se tratar de um sistema com multiplas tarefas, um recurso pode ser solicitado por diferentes rotinas ocasionando um erro. Para que isso não ocorra é utilizado um semáforo. Somente o processo que estiver com a liberação do semáforo utilizará o recurso e os demais ficarão aguardando sua liberação.
  
- Para disponibilizar a data e hora para o programa é utilizado a função Timer do próprio FreeRTOS. Esta função é disparada periodicamente e tem a função de atualizar a hora do sistema. Qualquer tarefa pode obter a hora atual lendo a variavel global "vGlobalTempo" com a utilização do semáforo "SemafTime"
+ Para disponibilizar a data e hora para o programa é utilizado a função Timer do próprio FreeRTOS. Esta função é disparada periodicamente e tem a função de atualizar a hora do sistema. Qualquer tarefa pode obter a hora atual lendo a variavel global ```C++ vGlobalTempo ``` com a utilização do semáforo "SemafTime"
  
 
 
