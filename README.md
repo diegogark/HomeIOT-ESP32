@@ -30,7 +30,7 @@ Uma versão do aplicativo para monitoramento e controle via celular pode ser enc
  
 ## Adicionando Sensores
 
-Para adicionar um sensor ao código basta criar uma nova tarefa utilizano o código abaixo:
+Para adicionar um sensor ao código basta criar uma nova tarefa no Setup utilizano o código abaixo:
 ```C++
 xTaskCreatePinnedToCore(taskSensorBMP180, "BMP180", 2048, NULL, 3, NULL, PRO_CPU_NUM);
 ```
@@ -41,15 +41,117 @@ xTaskCreatePinnedToCore(taskSensorBMP180, "BMP180", 2048, NULL, 3, NULL, PRO_CPU
 * ```3``` - prioridade da tarefa. quanto mais alto o numero, maior sua prioridade.
 * ```PRO_CPU_NUM``` - nucleo onde será executado a tarefa.
 
-A quantidade de memoria utilizada pela tarefa pode ser acompanhada através dos comandos do quadro abaixo. Esses comandos exibe na serial a quantidade de memoria livre na tarefa (task).
+A quantidade de memoria utilizada pela tarefa pode ser acompanhada através dos comandos do quadro abaixo. Esses comandos exibe na serial a quantidade de memoria livre na tarefa (task). Através dele é possivel determinar a quatidade necessária de memoria que a tarefa irá utilizar. Deixe uma sobrade memória por segurança.
 ```C++
-      uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
-      Serial.print("Memoria DHT11: ");
-      Serial.println(uxHighWaterMark); // quantidade de memoria sobrando para a tarefa
+uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
+Serial.print("Memoria BMP180: ");
+Serial.println(uxHighWaterMark); // quantidade de memoria sobrando para a tarefa
 ```
+Recomendo utilizar o nucleo ```PRO_CPU_NUM``` do ESP32 para trabalhar com sensores e comandos deixando o ```APP_CPU_NUM``` dedicado a tarefas que utilizam o firebase.
 
- Se em algum momento a rotina ultrapassar o limite estipulado, causará um erro.
-  Recomendo utilizar esse nucleo para que o outro ```APP_CPU_NUM``` fique dedicado ao firebase.
+Com a tarefa criada no Setup, é hora de escrever o código que será executado por ela. Abaixo está um exemplo de tarefa de sensor.
+
+```C++
+void taskSensorBMP180(void *arg)
+{
+//--- esta parte será executada apenas 1 vez. Funciona parecido com o Setup da IDE do arduino ---
+  Adafruit_BMP085 bmp;
+  if (!bmp.begin()) // está conactado na porta padrão. para modificar usar bmp.begin(SCL, SDA)
+    Serial.println("Could not find a valid BMP180 sensor, check wiring!");
+  int contador = 0;
+  Gravar sTemperatura;
+  Gravar sPressao;
+  sTemperatura.ID = "BMPtemperatura";
+  sTemperatura.sensorUnidade = "°C";
+  sTemperatura.sensorValorMinimo = 100;
+  sTemperatura.isComando = false;
+  sPressao.ID = "BMPpressao";
+  sPressao.sensorUnidade = "hPa";
+  sPressao.sensorValorMinimo = 200000;
+  sPressao.isComando = false;
+  int horaReset = 1;
+  bool isReseted = false;
+//---------------------------------------------------------------------------------------------------
+// Inicio da função de ciclo infinito. Funciona parecido com o ```void loop``` da IDE do arduino
+  while (1)
+  {
+    float buff = bmp.readTemperature();
+    if (buff < 100 && buff > -100)
+    {
+      sTemperatura.sensorValor = buff;
+      if (sTemperatura.sensorValorMedio == 0)
+      {
+        sTemperatura.sensorValorMedio = buff;
+      }
+      else
+      {
+        sTemperatura.sensorValorMedio = ((sTemperatura.sensorValorMedio * 29) + buff) / 30;
+      }
+      if (sTemperatura.sensorValorMaximo < sTemperatura.sensorValor)
+      {
+        sTemperatura.sensorValorMaximo = sTemperatura.sensorValor;
+      }
+      if (sTemperatura.sensorValorMinimo > sTemperatura.sensorValor)
+      {
+        sTemperatura.sensorValorMinimo = sTemperatura.sensorValor;
+      }
+    }
+    buff = bmp.readPressure();
+    buff = buff / 100;
+    if (buff < 200000 && buff > 1)
+    {
+      sPressao.sensorValor = buff;
+      if (sPressao.sensorValorMedio == 0)
+      {
+        sPressao.sensorValorMedio = buff;
+      }
+      else
+      {
+        sPressao.sensorValorMedio = ((sPressao.sensorValorMedio * 29) + buff) / 30;
+      }
+      if (sPressao.sensorValorMaximo < sPressao.sensorValor)
+      {
+        sPressao.sensorValorMaximo = sPressao.sensorValor;
+      }
+      if (sPressao.sensorValorMinimo > sPressao.sensorValor)
+      {
+        sPressao.sensorValorMinimo = sPressao.sensorValor;
+      }
+    }
+    if (contador > 6)
+    {
+      xQueueSend(xFilaGravar, &sTemperatura, pdMS_TO_TICKS(1000));
+      xQueueSend(xFilaGravar, &sPressao, pdMS_TO_TICKS(1000));
+      contador = 0;
+      if (xSemaphoreTake(xSemafTime, pdMS_TO_TICKS(100)))
+      {
+        horaReset = vGlobalTempo.hora;
+        xSemaphoreGive(xSemafTime);
+      }
+      if (horaReset == 0)
+      {
+        if (!isReseted)
+        {
+          sTemperatura.sensorValorMaximo = 0;
+          sTemperatura.sensorValorMinimo = 100;
+          sPressao.sensorValorMaximo = 0;
+          sPressao.sensorValorMinimo = 200000;
+          isReseted = true;
+        }
+      }
+      else
+      {
+        isReseted = false;
+      }
+      uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
+      Serial.print("Memoria BMP180: ");
+      Serial.println(uxHighWaterMark); // quantidade de memoria sobrando para a tarefa
+    }
+    contador++;
+    vTaskDelay(pdMS_TO_TICKS(10000));
+  }
+}
+```
 
 ## Adicionando Comandos
 
