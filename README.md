@@ -54,17 +54,12 @@ Com a tarefa criada no Setup, é hora de escrever o código que será executado 
 ```C++
 void taskSensorBMP180(void *arg)
 {
-//--- esta parte será executada apenas 1 vez. Funciona parecido com o Setup da IDE do arduino ---
+//--- esta parte será executada apenas 1 vez. Funciona parecido com o void setup da IDE do arduino ---
   Adafruit_BMP085 bmp;
   if (!bmp.begin()) // está conactado na porta padrão. para modificar usar bmp.begin(SCL, SDA)
     Serial.println("Could not find a valid BMP180 sensor, check wiring!");
   int contador = 0;
-  Gravar sTemperatura;
   Gravar sPressao;
-  sTemperatura.ID = "BMPtemperatura";
-  sTemperatura.sensorUnidade = "°C";
-  sTemperatura.sensorValorMinimo = 100;
-  sTemperatura.isComando = false;
   sPressao.ID = "BMPpressao";
   sPressao.sensorUnidade = "hPa";
   sPressao.sensorValorMinimo = 200000;
@@ -72,31 +67,12 @@ void taskSensorBMP180(void *arg)
   int horaReset = 1;
   bool isReseted = false;
 //---------------------------------------------------------------------------------------------------
-// Inicio da função de ciclo infinito. Funciona parecido com o ```void loop``` da IDE do arduino
+
+// Inicio da função de ciclo infinito. Funciona parecido com o void loop da IDE do arduino
+
   while (1)
   {
-    float buff = bmp.readTemperature();
-    if (buff < 100 && buff > -100)
-    {
-      sTemperatura.sensorValor = buff;
-      if (sTemperatura.sensorValorMedio == 0)
-      {
-        sTemperatura.sensorValorMedio = buff;
-      }
-      else
-      {
-        sTemperatura.sensorValorMedio = ((sTemperatura.sensorValorMedio * 29) + buff) / 30;
-      }
-      if (sTemperatura.sensorValorMaximo < sTemperatura.sensorValor)
-      {
-        sTemperatura.sensorValorMaximo = sTemperatura.sensorValor;
-      }
-      if (sTemperatura.sensorValorMinimo > sTemperatura.sensorValor)
-      {
-        sTemperatura.sensorValorMinimo = sTemperatura.sensorValor;
-      }
-    }
-    buff = bmp.readPressure();
+    float buff = bmp.readPressure();
     buff = buff / 100;
     if (buff < 200000 && buff > 1)
     {
@@ -120,9 +96,12 @@ void taskSensorBMP180(void *arg)
     }
     if (contador > 6)
     {
-      xQueueSend(xFilaGravar, &sTemperatura, pdMS_TO_TICKS(1000));
-      xQueueSend(xFilaGravar, &sPressao, pdMS_TO_TICKS(1000));
+    // IMPORTANTE
+    // esta parte do programa grava as informações do sensor na QUEUE para que seja gravado no firebase
+      xQueueSend(xFilaGravar, &sPressao, pdMS_TO_TICKS(1000));// espera até 1 segunto para gravar na QUEUE
+    //--------------------------------------------------------------
       contador = 0;
+    // verifica se mudou de dia para resetar o valor medio diário
       if (xSemaphoreTake(xSemafTime, pdMS_TO_TICKS(100)))
       {
         horaReset = vGlobalTempo.hora;
@@ -132,8 +111,6 @@ void taskSensorBMP180(void *arg)
       {
         if (!isReseted)
         {
-          sTemperatura.sensorValorMaximo = 0;
-          sTemperatura.sensorValorMinimo = 100;
           sPressao.sensorValorMaximo = 0;
           sPressao.sensorValorMinimo = 200000;
           isReseted = true;
@@ -143,12 +120,15 @@ void taskSensorBMP180(void *arg)
       {
         isReseted = false;
       }
+      //---------------------------------------------------------------
+      // informa a memoria livre da task
       uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
       Serial.print("Memoria BMP180: ");
       Serial.println(uxHighWaterMark); // quantidade de memoria sobrando para a tarefa
+      //---------------------------------------------------------------------
     }
     contador++;
-    vTaskDelay(pdMS_TO_TICKS(10000));
+    vTaskDelay(pdMS_TO_TICKS(10000)); // este comando libera o processador para executar outras tarefas. O tempo está definido em 10 segundos neste exemplo
   }
 }
 ```
