@@ -35,13 +35,17 @@ Para adicionar um sensor ao código basta criar uma nova tarefa utilizano o cód
 xTaskCreatePinnedToCore(taskSensorBMP180, "BMP180", 2048, NULL, 3, NULL, PRO_CPU_NUM);
 ```
 * ```taskSensorBMP180``` - Nome da tarefa que será chamada após sua criação.
-* ```"BMP180"        ``` - Não tem relevancia no programa. serve apenas para identificação da tarefa durante o debugg.
-* ```2048            ``` - quantidade de memória resevada para execução da tarefa. Se em algum momento a rotina ultrapassar o limite estipulado, causará um erro.
-* ```NULL            ``` - Não é necessário alterar.
-* ```3               ``` - prioridade da tarefa. quanto mais alto o numero, maior sua prioridade.
-* ```PRO_CPU_NUM     ``` - nucleo onde será executado a tarefa. Recomendo utilizar esse nucleo para que o outro ```APP_CPU_NUM``` fique dedicado ao firebase.
+* ```"BMP180"``` - Não tem relevancia no programa. serve apenas para identificação da tarefa durante o debugg.
+* ```2048``` - quantidade de memória resevada para execução da tarefa. Se em algum momento a rotina ultrapassar o limite estipulado, causará um erro.
+* ```NULL``` - Não é necessário alterar.
+* ```3``` - prioridade da tarefa. quanto mais alto o numero, maior sua prioridade.
+* ```PRO_CPU_NUM``` - nucleo onde será executado a tarefa. Recomendo utilizar esse nucleo para que o outro ```APP_CPU_NUM``` fique dedicado ao firebase.
 
 ## Adicionando Comandos
+
+ -[ ] opção 1
+ -[ ] dois
+ -[x] treis
 
 
 
